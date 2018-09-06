@@ -1,0 +1,17 @@
+{
+  "name": "raptor-models",
+  "version": "1.0.0",
+  "description": "Raptorbox objects definitions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ans Riaz <ansriazch@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "mongoose": "^5.2.13",
+    "uuid": "^3.3.2",
+    "winston": "^3.1.0"
+  }
+}
