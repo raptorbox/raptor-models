@@ -4,8 +4,8 @@ const Schema = mongoose.Schema
 const DevStream = require('./stream')
 const Action = require('./action')
 const uuidv4 = require('uuid/v4')
-const logger = require('../../helper/logger')
-const errors = require('../../helper/errors')
+const logger = require('../helper/logger')
+const errors = require('../helper/errors')
 
 var DeviceSetting = {
     eventsEnabled: true,

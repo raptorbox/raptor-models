@@ -5,8 +5,8 @@ const Channel = require('./channel')
 const DevStream = require('./stream')
 const Location = require('./location')
 const uuidv4 = require('uuid/v4')
-const logger = require('../../helper/logger')
-const errors = require('../../helper/errors')
+const logger = require('../helper/logger')
+const errors = require('../helper/errors')
 
 var RecordSet = new Schema({
     id: {

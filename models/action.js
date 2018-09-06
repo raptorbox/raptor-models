@@ -1,8 +1,8 @@
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const logger = require('../../helper/logger')
-const errors = require('../../helper/errors')
+const logger = require('../helper/logger')
+const errors = require('../helper/errors')
 
 var Action = new Schema({
     id: {

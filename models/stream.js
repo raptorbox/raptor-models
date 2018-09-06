@@ -4,8 +4,8 @@ const Schema = mongoose.Schema
 const Channel = require('./channel')
 // const Device = require('./device')
 // const raptor = require('./raptor').client()
-const logger = require('../../helper/logger')
-const errors = require('../../helper/errors')
+const logger = require('../helper/logger')
+const errors = require('../helper/errors')
 
 var DevStream = new Schema({
     name: {
