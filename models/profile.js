@@ -59,4 +59,4 @@ Profile.methods.merge = function(p) {
         })
 }
 
-module.exports = mongoose.model('Profile', Profile)
+module.exports = mongoose.model('Profile', Profile, 'profile')
