@@ -27,9 +27,12 @@ var DevStream = new Schema({
         of: Channel.schema,
         default: new Map()
     },
-    // device: {
-    //     type: Device.Schema
-    // }
+    deviceId: {
+        type: String
+    },
+    userId: {
+        type: String
+    }
 }, {
     toJSON: {
         transform: function (doc, ret) {
@@ -80,6 +83,14 @@ DevStream.methods.merge = function(t) {
                 st.dynamic = t.dynamic
             }
 
+            if (t.deviceId) {
+                st.deviceId = t.deviceId
+            }
+
+            if (t.userId) {
+                st.userId = t.userId
+            }
+
             if (t.channels != null) {
                 if (t.channels instanceof Map) {
                     t.channels.forEach((value, key, map) => {
@@ -122,7 +133,7 @@ DevStream.methods.addChannel = function(name, type) {
     ch.name = name
     ch.type = type
     ch.unit = null
-    this.channels.set(name, ch) 
+    this.channels.set(name, ch)
 }
 
 DevStream.methods.addChannel = function(name, type, unit) {
@@ -134,7 +145,14 @@ DevStream.methods.addChannel = function(name, type, unit) {
     ch.name = name
     ch.type = type
     ch.unit = unit
-    this.channels.set(name, ch) 
+    this.channels.set(name, ch)
+}
+
+DevStream.methods.getChannels = function() {
+    return Channel.find(this).then((chs) => {
+        console.log(chs)
+        return chs
+    })
 }
 
 DevStream.pre('save', function(next) {

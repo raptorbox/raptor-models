@@ -1,2 +1,2 @@
 
-module.exports.App = require('../models/app')
+module.exports.App = require('./app')

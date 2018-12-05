@@ -63,15 +63,15 @@ var TreeNode = new Schema({
 
 TreeNode.plugin(require('./plugin/pager'))
 
-var EntityType = ['app', 'device', 'stream', 'action', 'data', 'tree', 'profile', 
+var EntityType = ['app', 'device', 'stream', 'action', 'data', 'tree', 'profile',
 'user', 'permission', 'group', 'token']
 
-TreeNode.pre('init', function(next) {
-    if(EntityType.indexOf(this.type) > -1) {
-        throw new errors.NotFound()
-    }
-    next()
-})
+// TreeNode.pre('init', function() {
+//     console.log(this.type, '======================')
+//     if(EntityType.indexOf(this.type) == -1) {
+//         throw new errors.NotFound('Tree of type ', this.type, ' cannot be made')
+//     }
+// })
 
 TreeNode.methods.create = function(deviceId, userId) {
     let node = new TreeNode
@@ -187,27 +187,46 @@ TreeNode.methods.path = function() {
     return p
 }
 
-TreeNode.methods.getChildren = function(node) {
-    if (node.userId != null) {
-        let nodeId = node.id
-        let andQuery = []
-        andQuery.push({ 'userId': node.userId})
-        if (nodeId != null) {
-            andQuery.push({ 'id': nodeId })
-        } else {
-            andQuery.push({ 'id': null })
-        }
-        return TreeNode.find({ '$and': andQuery })
-            .then(nodes => {
-                return nodes
-            })
-    } else {
-        throw new errors.NotFound('UserId is missing')
-    }
+TreeNode.methods.getChildren = function(node=null) {
+    return Promise.resolve()
+        .then(() => {
+            let andQuery = []
+            if (node && node.userId != null) {
+                andQuery.push({ 'userId': node.userId})
+            }
+            // console.log(node)
+            andQuery.push({ 'parentId': (node && node.id != null) ? node.id : this.id })
+            let q = {}
+            if(andQuery.length > 0) {
+                q = { '$and': andQuery }
+            }
+            return mongoose.model('TreeNode').find(q)
+                .then(nodes => {
+                    let promises = []
+                    nodes.forEach(n => {
+                        // n.children = n.getChildren()
+                        let p = new Promise((resolve, reject) => {
+                            return n.getChildren().then(kids => {
+                                n.children = kids
+                                // console.log(n)
+                                resolve()
+                            })
+                        })
+                        // .then(result => {
+                        //     n.children = n.getChildren()
+                        // })
+                        promises.push(p)
+                    })
+                    return Promise.all(promises).then(() => {
+                        return nodes
+                    })
+                    // return Promise.resolve(nodes)
+                })
+        })
 }
 
 TreeNode.pre('save', function(next) {
-    if(EntityType.indexOf(this.type) > -1) {
+    if(EntityType.indexOf(this.type) == -1) {
         throw new errors.NotFound('Tree of type ', this.type, ' cannot be made')
     }
     next()

@@ -43,7 +43,7 @@ var Channel = new Schema({
 //     Device.findOne({id: devId})
 //         .then(dev => {
 //             if(!dev) throw new errors.NotFound()
-//             // this.device = dev 
+//             // this.device = dev
 //             return Promise.resolve(dev)
 //         })
 // }
@@ -52,7 +52,7 @@ var Channel = new Schema({
 //     DevStream.findOne({id: streamId})
 //         .then(st => {
 //             if(!st) throw new errors.NotFound()
-//             // this.device = dev 
+//             // this.device = dev
 //             return Promise.resolve(st)
 //         })
 // }
@@ -61,7 +61,7 @@ var Channel = new Schema({
 //     DevStream.findOne({id: this.streamId})
 //         .then(st => {
 //             if(!st) throw new errors.NotFound()
-//             // this.device = dev 
+//             // this.device = dev
 //             return Promise.resolve(st)
 //         })
 // }

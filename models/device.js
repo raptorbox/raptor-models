@@ -58,10 +58,12 @@ var Device = new Schema({
         default: DeviceSetting
     },
     createdAt: {
-        type: Date
+        type: Number,
+        required: true
     },
     updatedAt: {
-        type: Date
+        type: Number,
+        required: true
     }
 }, {
   collection: 'device'
@@ -90,6 +92,9 @@ Device.methods.merge = function(dev) {
 
     return Promise.resolve()
         .then(() => {
+            if (dev._id) {
+                // device._id = device.id = dev.id
+            }
 
             if (dev.name) {
                 device.name = dev.name
@@ -105,6 +110,8 @@ Device.methods.merge = function(dev) {
 
             if (dev.domain) {
                 device.domain = dev.domain
+            } else {
+                device.domain = null
             }
 
             if (dev.settings) {
@@ -115,28 +122,46 @@ Device.methods.merge = function(dev) {
                 device.properties = dev.properties
             }
 
-            // if (device.streams == null) {
-            //     device.streams = new Map()
-            // }
+            if (dev.createdAt) {
+                device.createdAt = dev.createdAt
+            }
 
-            // if (device.actions == null) {
-            //     device.actions = new Map()
-            // }
+            if (dev.updatedAt) {
+                device.updatedAt = dev.updatedAt
+            }
 
             if (dev.streams) {
                 // device.streams = dev.streams
 
                 if (dev.streams instanceof Map) {
                     dev.streams.forEach(function(value, key, map) {
-                        // console.log('key: "' + key + '", value: "' + value + '"');
-                        device.streams.set(key, value)
-                        // value.setDevice(device)
+                        let st = value
+                        // st.deviceId = device.id
+                        // let k = Object.keys(st)
+                        // if(k == 'channels') {
+                        //     st.dynamic = true
+                        // }
+                        // if(k == 'dynamic') {
+                        //     st.dynamic = k
+                        // }
+                        // st.name = key
+                        // st.userId = device.userId
+                        device.streams.set(key, st)
                     });
                 } else {
                     Object.keys(dev.streams).forEach(key => {
-                        // console.log('key: "' + key + '", value: "' + value + '"');
-                        device.streams.set(key, dev.streams[key])
-                        // value.setDevice(device)
+                        let st = dev.streams[key]
+                        // st.deviceId = device.id
+                        // let k = Object.keys(st)
+                        // if(k == 'channels') {
+                        //     st.dynamic = true
+                        // }
+                        // if(k == 'dynamic') {
+                        //     st.dynamic = k
+                        // }
+                        // st.name = key
+                        // st.userId = device.userId
+                        device.streams.set(key, st)
                     });
                 }
             }
@@ -160,7 +185,7 @@ Device.methods.merge = function(dev) {
 Device.methods.setDefaults = function() {
     this.id = uuidv4()
     this._id = this.id
-    this.createdAt = (new Date()).getTime()
+    this.createdAt = ((new Date()).getTime()/1000)
     this.updatedAt = this.createdAt
     // this.streams = new Map()
     // this.actions = new Map()
@@ -173,8 +198,6 @@ Device.methods.setUpdateTime = function() {
 Device.methods.addStreams = function(streams) {
     let dev = this
     streams.forEach(function(value, key, map) {
-        // console.log('key: "' + key + '", value: "' + value + '"');
-        // value.setDevice(device)
         let prevStream = dev.streams.get(value)
         value.channels.forEach(function(chVal, chKey, map) {
             if(prevStream != null) {
@@ -234,7 +257,7 @@ Device.methods.getStream = function(streamId) {
 }
 
 Device.pre('save', function(next) {
-    this.timestamp = (new Date()).getTime()
+    // this.createdAt = (new Date()).getTime()
     if(!this.id) {
         this.id = uuidv4()
     }

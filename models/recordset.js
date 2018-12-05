@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const Channel = require('./channel')
 const DevStream = require('./stream')
+const Device = require('./device')
 const Location = require('./location')
 const uuidv4 = require('uuid/v4')
 const logger = require('../helper/logger')
@@ -15,7 +16,7 @@ var RecordSet = new Schema({
         default: uuidv4
     },
     timestamp: {
-        type: Date,
+        type: Number,
         index: true,
         required: true
     },
@@ -37,7 +38,15 @@ var RecordSet = new Schema({
         required: true
     },
     location: {
-        type: Location.schema
+        type: { type: String },
+        coordinates: {type: [Number], index: '2dsphere'}
+    },
+    device: {
+        type: Schema.Types.Mixed,
+        default: null
+    },
+    raw: {
+        type: String
     },
     // stream: {
     //     type: DevStream.schema
@@ -54,6 +63,8 @@ var RecordSet = new Schema({
         }
     }
 })
+
+RecordSet.index({ "location": "2dsphere" })
 
 // RecordSet.virtual('stream').get(function() {
 //     return DevStream.find({id: this.streamId})
@@ -80,6 +91,14 @@ RecordSet.plugin(require('./plugin/pager'))
 //     this.streamId = stream.id
 // }
 
+RecordSet.methods.getDevice = function() {
+    if(this.deviceId) {
+        return Promise.resolve(Device.findOne({_id: this.deviceId}))
+    } else {
+        return null
+    }
+}
+
 RecordSet.methods.setStream = function(stream) {
     this.streamId = stream.id
 }
@@ -88,8 +107,6 @@ RecordSet.methods.merge = function(t) {
     const record = this
     return Promise.resolve()
         .then(() => {
-
-            console.log(t)
 
             if(t.id) {
                 record.id = t.id
@@ -128,11 +145,17 @@ RecordSet.methods.merge = function(t) {
             if(t.deviceId) {
                 record.deviceId = t.deviceId
             }
-            if(t.location) {
+            if (t.location) {
                 record.location = t.location
+            }
+            if(record.location == null || record.location == {}) {
+                record.location == [null, null]
             }
             if(t.stream) {
                 record.stream = t.stream
+            }
+            if(t.raw) {
+                record.raw = t.raw
             }
 
             return Promise.resolve()
@@ -149,11 +172,20 @@ function toObject(stream, value, key) {
 }
 
 RecordSet.pre('save', function(next) {
-    this.timestamp = (new Date()).getTime()
+    if(!this.timestamp || this.timestamp == NaN) {
+        this.timestamp = (new Date()).getTime()
+    }
     if(!this.id) {
         this.id = uuidv4()
     }
     delete this.stream
+    if(this.timestamp.toString().length == 10) {
+        this.timestamp = this.timestamp * 1000
+    } else if (this.timestamp instanceof String) {
+        this.timestamp = Date.parse(this.timestamp)
+    } else if (this.timestamp instanceof Number) {
+        this.timestamp = Date.parse(this.timestamp)
+    }
     next()
 })
 

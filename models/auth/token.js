@@ -1,7 +1,6 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 const rand = require('./plugin/random')
-const config = require('../config')
 const uuidv4 = require('uuid/v4')
 const logger = require('../../helper/logger')
 const errors = require('../../helper/errors')

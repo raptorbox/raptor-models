@@ -8,8 +8,8 @@
 // module.exports.Stream = require('./stream')
 
 const models = {
-    App: require('../models/app'),
-    Action: require('./action'),
+  App: require('../models/app'),
+  Action: require('./action'),
 	Channel: require('./channel'),
 	Device: require('./device'),
 	TreeNode: require('./treeNode'),
@@ -17,10 +17,10 @@ const models = {
 	RecordSet: require('./recordset'),
 	Stream: require('./stream'),
 
-	User: require('./user'),
-	Role: require('./role'),
-	Token: require('./token'),
-	
+	User: require('./auth/user'),
+	Role: require('./auth/role'),
+	Token: require('./auth/token'),
+
 	// Acl: require('./acl'),
 	// Client: require('./oauth2/client'),
 	// RefreshToken: require('./oauth2/refresh_token'),
