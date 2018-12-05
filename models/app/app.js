@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 const AppUser = require('./app_user')
 const AppRole = require('./app_role')
 const AppDelta = require('./app_delta')
+const AppPayloadCodec = require('./app_payload_codec')
 const uuidv4 = require('uuid/v4')
 const logger = require('../../helper/logger')
 
@@ -48,6 +49,9 @@ var App = new Schema({
     delta: {
         type: AppDelta.schema,
         default: {}
+    },
+    payload_codec: {
+      type: AppPayloadCodec.schema
     }
 }, {
     toJSON: {
@@ -58,7 +62,7 @@ var App = new Schema({
     }
 })
 
-App.plugin(require('../plugin/pager'))
+App.plugin(require('./plugin/pager'))
 
 App.methods.isOwner = function(user) {
     return this.userId === user.id
@@ -149,6 +153,11 @@ App.methods.merge = function(t) {
                     logger.debug(t.properties[keys[i]])
                     app.properties[keys[i]] = t.properties[keys[i]]
                 }
+            }
+
+            // Payload codec: payload decoding type and function
+            if(t.payload_codec) {
+                app.payload_codec = t.payload_codec
             }
 
             return Promise.resolve()
